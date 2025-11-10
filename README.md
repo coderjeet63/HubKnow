@@ -92,7 +92,7 @@ This is a critical step for setting up the backend.
 
     ```env
     # Your MongoDB Connection String (local or Atlas)
-    MONGO_URI=mongodb://localhost:27017/knowledgehub
+    MONGO_URI=your
     
     # Your Server Port
     PORT=5000
@@ -123,7 +123,7 @@ You will need two separate terminals to run the frontend and backend simultaneou
 2.  **Run the Frontend App:**
     (In your second terminal, from the `frontend` folder)
     ```bash
-    npm start
+    npm run dev
     ```
     *The React app will open in your browser at `http://localhost:3000`*
 
@@ -131,5 +131,4 @@ You will need two separate terminals to run the frontend and backend simultaneou
 
 ## 💻 Usage
 
-* **Public Site:** Open [http://localhost:3000](http://localhost:3000) to browse articles.
-* **Admin Panel:** Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) (or your admin route) and log in with the admin credentials.
+* **Public Site:** Open [http://localhost:3000](http://localhost:5173) to browse articles.

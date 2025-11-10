@@ -89,17 +89,24 @@ This is a critical step for setting up the backend.
 
     ```env
     # Your MongoDB Connection String (local or Atlas)
-    MONGO_URI=your_mongodb_connection_string_here
+    MONGO_URI="your mongo url"
     
     # Your Server Port
     PORT=5000
     
-    # Admin Credentials (as you requested)
+    # JWT Secret Key
+    JWT_SECRET=12345
+    
+    # Google Gemini API Key
+    GEMINI_API_KEY="your api key"
+    
+    # LLM Provider
+    LLM_PROVIDER=gemini
+    
+    # Admin Credentials
     ADMIN_EMAIL=abc@gmail.com
     ADMIN_PASSWORD=abc@gmail.com
     # You can make anyone an admin, just change the user's role in MongoDB
-    
-    # (Add any other secrets, like JWT_SECRET or GEMINI_API_KEY, if you have one)
     ```
 
 ---

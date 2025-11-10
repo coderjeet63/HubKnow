@@ -2,8 +2,6 @@
 
 Welcome to Knowledge Hub, a full-stack application for sharing and managing articles and information. This project is built with a separate frontend and backend, using the MERN stack.
 
-
-
 ---
 
 ## 📋 Table of Contents
@@ -19,9 +17,7 @@ Welcome to Knowledge Hub, a full-stack application for sharing and managing arti
 
 ## 📖 Project Description
 
-(Add 2-3 sentences describing your project here. What does it do? Why did you build it?)
-
-* **Example:** "Knowledge Hub is a platform where users can browse technical articles and resources. It features a secure admin panel for content creators to manage (create, read, update, and delete) articles."
+"Knowledge Hub is a platform where users can browse and add articles. By using the Gemini API, it can generate summarized articles and resources. It features a secure admin panel for content creators to manage articles (CRUD) and users."
 
 ---
 
@@ -31,10 +27,12 @@ Welcome to Knowledge Hub, a full-stack application for sharing and managing arti
     * Browse all published articles
     * Search for specific articles
     * Read full articles
+    * Summarize articles using the Gemini API
 * **Admin Features:**
     * Secure admin login
     * CRUD Operations: Create, Read, Update, and Delete articles
     * Manage article categories
+    * Manage users
 
 ---
 
@@ -59,7 +57,6 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 You must have the following software installed:
 * [Node.js](https://nodejs.org/) (which includes `npm`)
-* [MongoDB](https://www.mongodb.com/try/download/community) (or a MongoDB Atlas account)
 
 ### 2. Installation
 
@@ -92,7 +89,7 @@ This is a critical step for setting up the backend.
 
     ```env
     # Your MongoDB Connection String (local or Atlas)
-    MONGO_URI=your
+    MONGO_URI=your_mongodb_connection_string_here
     
     # Your Server Port
     PORT=5000
@@ -100,12 +97,10 @@ This is a critical step for setting up the backend.
     # Admin Credentials (as you requested)
     ADMIN_EMAIL=abc@gmail.com
     ADMIN_PASSWORD=abc@gmail.com
+    # You can make anyone an admin, just change the user's role in MongoDB
     
-    # (Add any other secrets, like JWT_SECRET, if you have one)
+    # (Add any other secrets, like JWT_SECRET or GEMINI_API_KEY, if you have one)
     ```
-
-> **Security Warning:** The `.env` file contains sensitive passwords and keys. **NEVER** commit this file to GitHub. Make sure you have a `.gitignore` file in your main `Knowledge Hub` folder and that it contains the line:
-> `.env`
 
 ---
 
@@ -125,10 +120,10 @@ You will need two separate terminals to run the frontend and backend simultaneou
     ```bash
     npm run dev
     ```
-    *The React app will open in your browser at `http://localhost:3000`*
+    *The React app will open in your browser at `http://localhost:5173` (or a similar port)*
 
 ---
 
 ## 💻 Usage
 
-* **Public Site:** Open [http://localhost:3000](http://localhost:5173) to browse articles.
+* **Public Site:** Open [http://localhost:5173](http://localhost:5173) to browse articles.

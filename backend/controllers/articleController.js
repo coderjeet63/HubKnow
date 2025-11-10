@@ -6,36 +6,35 @@ const { summarizeWithLLM } = require('../services/llmService.js');
 exports.createArticle = async (req, res, next) => {
   try {
     const { title, content, tags } = req.body;
+
     const article = new Article({
       title,
       content,
       tags: tags || [],
-      createdBy: req.user._id, // req.user is from 'protect' middleware
+      createdBy: req.user._id,
     });
+
     const createdArticle = await article.save();
     res.status(201).json(createdArticle);
   } catch (error) {
+    console.error('Error creating article:', error.message);
     next(error);
   }
 };
 
-// @desc    Get articles (All for Admin, Own for User)
-// @route   GET /articles
+// @desc    Get all articles (Admin sees all, user sees own)
 exports.getArticles = async (req, res, next) => {
   try {
     let query = {};
 
-    // --- THIS IS THE LOGIC YOU WANT ---
     if (req.user.role !== 'admin') {
-      // If user is NOT an admin, only find articles they created
       query = { createdBy: req.user._id };
     }
-    // If user IS an admin, query remains {} (empty), finding all articles.
-    // --- END OF LOGIC ---
 
     const articles = await Article.find(query).populate('createdBy', 'name email');
     res.json(articles);
   } catch (error) {
+    console.error('Error fetching articles:', error.message);
     next(error);
   }
 };
@@ -46,25 +45,22 @@ exports.getArticleById = async (req, res, next) => {
   try {
     const article = await Article.findById(req.params.id);
 
-    if (article) {
-      // --- THIS IS THE LOGIC YOU WANT ---
-      // Check if the user is the creator OR an admin
-      if (req.user.role !== 'admin' && article.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403); // Forbidden
-        throw new Error('Not authorized to view this article');
-      }
-      // --- END OF LOGIC ---
-      res.json(article);
-    } else {
-      res.status(404).json({ message: 'Article not found' });
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
     }
+
+    if (req.user.role !== 'admin' && article.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to view this article' });
+    }
+
+    res.json(article);
   } catch (error) {
-     // This catches errors like invalid ObjectId
+    console.error('Error fetching article by ID:', error.message);
     next(error);
   }
 };
 
-// @desc    Update an article
+// @desc    Update article
 // @route   PUT /articles/:id
 exports.updateArticle = async (req, res, next) => {
   try {
@@ -72,15 +68,11 @@ exports.updateArticle = async (req, res, next) => {
     const article = await Article.findById(req.params.id);
 
     if (!article) {
-      res.status(404);
-      throw new Error('Article not found');
+      return res.status(404).json({ message: 'Article not found' });
     }
 
-    // --- THIS IS THE LOGIC YOU WANT ---
-    // Check permission: Must be owner OR admin
     if (req.user.role !== 'admin' && article.createdBy.toString() !== req.user._id.toString()) {
-      res.status(403);
-      throw new Error('User not authorized to edit this article');
+      return res.status(403).json({ message: 'User not authorized to edit this article' });
     }
 
     article.title = title || article.title;
@@ -90,30 +82,30 @@ exports.updateArticle = async (req, res, next) => {
     const updatedArticle = await article.save();
     res.json(updatedArticle);
   } catch (error) {
+    console.error('Error updating article:', error.message);
     next(error);
   }
 };
 
-// @desc    Delete an article (Admin only)
+// @desc    Delete article (Admin only)
 // @route   DELETE /articles/:id
 exports.deleteArticle = async (req, res, next) => {
   try {
     const article = await Article.findById(req.params.id);
-    if (article) {
-      // NOTE: The route 'articleRoutes.js' already uses 'isAdmin' middleware,
-      // so only admins can even reach this function. No extra check needed.
-      await article.deleteOne(); // or article.deleteOne()
-      res.json({ message: 'Article removed' });
-    } else {
-      res.status(404);
-      throw new Error('Article not found');
+
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
     }
+
+    await article.deleteOne();
+    res.json({ message: 'Article deleted successfully' });
   } catch (error) {
+    console.error('Error deleting article:', error.message);
     next(error);
   }
 };
 
-// @desc    Summarize article content
+// @desc    Summarize article
 // @route   POST /articles/:id/summarize
 exports.summarizeArticle = async (req, res, next) => {
   try {
@@ -122,23 +114,19 @@ exports.summarizeArticle = async (req, res, next) => {
       return res.status(404).json({ message: 'Article not found' });
     }
 
-    // --- THIS IS THE LOGIC YOU WANT ---
-    // Check permission: Must be owner OR admin
     if (req.user.role !== 'admin' && article.createdBy.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('User not authorized to summarize this article');
+      return res.status(403).json({ message: 'Not authorized to summarize this article' });
     }
 
-    // Use the LLM_PROVIDER from .env or default to 'gemini'
     const provider = process.env.LLM_PROVIDER || 'gemini';
     const summary = await summarizeWithLLM(article.content, provider);
-    
+
     article.summary = summary;
     const updatedArticle = await article.save();
-    
+
     res.json(updatedArticle);
   } catch (error) {
-    // The llmService will console.error the specific Gemini error
-    next(error); // Pass to general error handler
+    console.error('Error summarizing article:', error.message);
+    next(error);
   }
 };
